@@ -15,7 +15,7 @@ public class StudentEntity {
 	String firstname;
 	String lastname;
 	String email;
-	String password;
+	String password="1234";
 	public Integer getStdId() {
 		return stdId;
 	}
@@ -44,6 +44,12 @@ public class StudentEntity {
 		return password;
 	}
 	public void setPassword(String password) {
-		this.password = password;
+		if(password == null || password.isEmpty())
+		{
+			this.password="1234";
+		}
+		else {
+			this.password = password;			
+		}
 	}
 }

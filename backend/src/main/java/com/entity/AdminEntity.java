@@ -9,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name="Admin")
 
