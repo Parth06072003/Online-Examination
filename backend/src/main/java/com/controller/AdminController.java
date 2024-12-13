@@ -1,8 +1,12 @@
 package com.controller;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.AdminEntity;
+import com.entity.QuestionsEntity;
 import com.entity.StudentEntity;
 import com.repository.AdminRepo;
+import com.repository.QuestionsRepo;
 import com.repository.StudentRepo;
 
 @RestController
@@ -20,59 +26,86 @@ public class AdminController {
 	
 	@Autowired //Singleton Object (ChatGPT)
 	AdminRepo adminRepo;
-
+	@Autowired
+	StudentRepo studentRepo;
+	@Autowired
+	QuestionsRepo questionRepo;
 	
 	@PostMapping("/signup")
-	public String adminSignup(@RequestBody AdminEntity entity) {
+	public ResponseEntity<?> adminSignup(@RequestBody AdminEntity entity) {
+		HashMap<String , Object> response = new HashMap<>();
 		if(entity!=null)
 		{
 			adminRepo.save(entity);
-			return "Signup SuccessFully";
+			response.put("message", "Signup Successfully");
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		}
 		else {
-			return "please enter valid details";
+			response.put("error", "Signup Failed");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
 	@GetMapping("/login")
-	public String adminLogin(@RequestBody String email,@RequestBody String password)
+	public ResponseEntity<?> adminLogin(@RequestBody String email,@RequestBody String password)
 	{
-		if(email==null || email.isEmpty() || password == null || password.isEmpty())
-		{
-			return "Please Enter all the Details.";
-		}
-		else
-		{
-			Optional<AdminEntity> admin =adminRepo.findByEmail(email);
-			
-			if(admin.isPresent())
+		HashMap<String ,Object> response = new HashMap<>();
+		Optional<AdminEntity> admin =adminRepo.findByEmail(email);	
+		if(admin.isPresent())
 			{
 				if(admin.get().getPassword().equals(password))
 				{
-					return "Login Successfully";
+					response.put("message", "Login Successfully");
+					return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
 				}
 				else {
-					return "Invalid Password";
+					response.put("error", "Invalid Password");
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 				}
 			}
 			else
 			{
-				return "Admin Does not exist";
+				response.put("error", "Admin Not Exist");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 			}
 		}
-	}
+	
 	
 //-----------------------------------------------------------Student Creation Updation Deletation-------------------------------
-	@Autowired
-	StudentRepo studentRepo;
+
 	
 	@PostMapping("/createNewStudent")
-	public String studentCreate(@RequestBody StudentEntity entity)
+	public ResponseEntity<?> studentCreate(@RequestBody StudentEntity entity)
 	{
+		HashMap<String, Object> response =new HashMap<>();
 		if(entity!=null)
 		{
 			studentRepo.save(entity);
-			return "Student Added Succesfully";
+			response.put("message", "Student Added Successfully");
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		}
-		return "Please Enter Valid Details"; 
+		response.put("message", "Error in Adding Student");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); 
 	}
+
+
+//------------------------------------------------------------Questions CRUD-------------------------------------------------------
+
+
+
+@PostMapping("/createQuestions")
+public ResponseEntity<?> createQuestion(@RequestBody QuestionsEntity entity)
+{
+	HashMap<String,Object> response = new HashMap<>();
+	if(entity!= null)
+	{
+		questionRepo.save(entity);
+		response.put("message", "Question Added Successfully");
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+	else
+	{
+		response.put("error", "Error in Adding Question");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+}
 }
