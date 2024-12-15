@@ -12,33 +12,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="Questions")
+@Table(name="ProgQuestion")
+public class ProgramingQuestionEntity {
 
-
-
-
-public class QuestionsEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer queId;
-	@Column(nullable=false)
+	@Column(columnDefinition = "TEXT",nullable=false)
 	String question;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable=false)
-	Category category;
-	
-	@Column(nullable=false)
-	String opt1;
-	
-	@Column(nullable=false)
-	String opt2;
-	
-	String opt3;
-	String opt4;
-	
-	@Column(nullable=false)
-	Integer correctOpt;
+	Category_prgm category;
+	@Column(columnDefinition = "TEXT",nullable=false)
+	String answer;
 	
 	@ManyToOne
 	@JoinColumn(name= "adminId",nullable=false)
@@ -60,52 +46,20 @@ public class QuestionsEntity {
 		this.question = question;
 	}
 
-	public Category getCategory() {
+	public Category_prgm getCategory() {
 		return category;
 	}
 
-	public void setCategory(Category category) {
+	public void setCategory(Category_prgm category) {
 		this.category = category;
 	}
 
-	public String getOpt1() {
-		return opt1;
+	public String getAnswer() {
+		return answer;
 	}
 
-	public void setOpt1(String opt1) {
-		this.opt1 = opt1;
-	}
-
-	public String getOpt2() {
-		return opt2;
-	}
-
-	public void setOpt2(String opt2) {
-		this.opt2 = opt2;
-	}
-
-	public String getOpt3() {
-		return opt3;
-	}
-
-	public void setOpt3(String opt3) {
-		this.opt3 = opt3;
-	}
-
-	public String getOpt4() {
-		return opt4;
-	}
-
-	public void setOpt4(String opt4) {
-		this.opt4 = opt4;
-	}
-
-	public Integer getCorrectOpt() {
-		return correctOpt;
-	}
-
-	public void setCorrectOpt(Integer correctOpt) {
-		this.correctOpt = correctOpt;
+	public void setAnswer(String answer) {
+		this.answer = answer;
 	}
 
 	public AdminEntity getAdminEntity() {
@@ -115,11 +69,9 @@ public class QuestionsEntity {
 	public void setAdminEntity(AdminEntity adminEntity) {
 		this.adminEntity = adminEntity;
 	}
-	
 }
-
-enum Category{
-	Logical,
-	Technical,
-	Programming
+enum Category_prgm{
+	Easy,
+	Medium,
+	Hard
 }

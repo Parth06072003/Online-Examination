@@ -1,5 +1,6 @@
 package com.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,9 +13,13 @@ public class StudentEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer stdId;
+	@Column(nullable=false)
 	String firstname;
+	@Column(nullable=false)
 	String lastname;
+	@Column(nullable=false)
 	String email;
+	@Column(nullable=false)
 	String password="1234";
 	public Integer getStdId() {
 		return stdId;

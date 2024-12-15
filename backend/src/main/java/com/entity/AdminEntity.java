@@ -1,5 +1,6 @@
 package com.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -49,8 +50,12 @@ public class AdminEntity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	@Column(nullable=false)
 	String firstname;
+	@Column(nullable=false)
 	String lastname;
+	@Column(nullable=false)
 	String email;
+	@Column(nullable=false)
 	String password;
 }
