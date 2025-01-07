@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.AdminEntity;
 import com.repository.AdminRepo;
+import com.service.JWTService;
 
 @RestController
 @RequestMapping("/api/public/session")
@@ -21,34 +22,46 @@ public class SessionController {
 
 	@Autowired //Singleton Object (ChatGPT)
 	AdminRepo adminRepo;
-	
+	@Autowired
+	JWTService jwtService;
+
 	@PostMapping("/login")
-	public ResponseEntity<?> adminLogin(@RequestBody Map<String,String> reqbody)
-	{
+	  public ResponseEntity<?> login(@RequestBody Map<String,String> reqbody) {
 		HashMap<String ,Object> response = new HashMap<>();
 		
 		String email=reqbody.get("email");
 		String password=reqbody.get("password");
 		String role=reqbody.get("role");
 		
-		Optional<AdminEntity> admin =adminRepo.findByEmail(email);	
-		if(admin.isPresent())
-			{
-				if(admin.get().getPassword().equals(password))
-				{
-					response.put("message", "Login Successfully");
-					return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-				}
-				else {
-					response.put("error", "Invalid Password");
-					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-				}
-			}
-			else
-			{
-				response.put("error", "Admin Not Exist");
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-			}
-		}
-	
+	    if (role == null) {
+	      return ResponseEntity.badRequest().body("Role not specified");
+	    }
+
+	    switch (role.toLowerCase()) {
+	      case "admin":
+	        Optional<AdminEntity> admin = adminRepo.findByEmail(email);
+	        if (admin != null) {
+	          // Generate a random token (not JWT)
+	          // String token = service.generateToken();// Use a simple random UUID as the token
+	          String token = jwtService.generateToken(email, role);
+	          System.out.println("Before");
+	          System.out.println(token);
+	          System.out.println("After");
+
+	          response.put("message", "Login Successful as Admin.");
+	          response.put("token", token);
+	          response.put("ADMIN", admin);
+
+	          return ResponseEntity.ok()
+	              .header("Authorization", "Bearer " + token) // Send token in the response header
+	              .body(response);
+	        } else {
+	          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+	        }
+
+
+	      default:
+	        return ResponseEntity.badRequest().body("Invalid Role Specified");
+	    }
+	  }
 }
