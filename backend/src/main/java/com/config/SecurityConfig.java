@@ -23,7 +23,7 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/public/").permitAll()
+                        .requestMatchers("/api/public/session/login").permitAll()
                         .requestMatchers("/api/private/").hasAuthority("admin")
                         .anyRequest().authenticated())
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)

@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.AdminEntity;
+import com.entity.StudentEntity;
 import com.repository.AdminRepo;
+import com.repository.StudentRepo;
+import com.service.AdminService;
 import com.service.JWTService;
 
 @RestController
@@ -22,6 +25,10 @@ public class SessionController {
 
 	@Autowired //Singleton Object (ChatGPT)
 	AdminRepo adminRepo;
+	@Autowired
+	StudentRepo studRepo;
+	@Autowired
+	AdminService adminService;
 	@Autowired
 	JWTService jwtService;
 
@@ -39,10 +46,9 @@ public class SessionController {
 
 	    switch (role.toLowerCase()) {
 	      case "admin":
-	        Optional<AdminEntity> admin = adminRepo.findByEmail(email);
+	        AdminEntity admin =adminService.authenticateAdmin(email, password);
+	        System.out.println(admin);
 	        if (admin != null) {
-	          // Generate a random token (not JWT)
-	          // String token = service.generateToken();// Use a simple random UUID as the token
 	          String token = jwtService.generateToken(email, role);
 	          System.out.println("Before");
 	          System.out.println(token);
@@ -59,7 +65,24 @@ public class SessionController {
 	          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
 	        }
 
+	      case "student":
+	    	  Optional<StudentEntity> student = studRepo.findByEmail(email);
+	    	  if (student != null) {
+		          String token = jwtService.generateToken(email, role);
+		          System.out.println("Before");
+		          System.out.println(token);
+		          System.out.println("After");
 
+		          response.put("message", "Login Successful as Student.");
+		          response.put("token", token);
+		          response.put("Student", student);
+
+		          return ResponseEntity.ok()
+		              .header("Authorization", "Bearer " + token) // Send token in the response header
+		              .body(response);
+		        } else {
+		          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+		        }
 	      default:
 	        return ResponseEntity.badRequest().body("Invalid Role Specified");
 	    }
